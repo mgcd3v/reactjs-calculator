@@ -17,7 +17,6 @@ const getAmountWithComma = (amount) => {
                                             maximumFractionDigits: 6
                                         });
 
-    // Add back missing .0 in e.g. 12.0
     const match = amount.match(/\.\d*?(0*)$/)
     
     if (match){
