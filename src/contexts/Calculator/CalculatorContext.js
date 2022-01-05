@@ -4,7 +4,6 @@ import {
     getProcessedValueOnDisplay,
     getProcessedOperator,
     getProcessedIsNewOperator,
-    getProcessedSign,
 } from './CalculatorContextCustomHooks';
 
 const CalculatorContext = React.createContext();

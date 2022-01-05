@@ -100,25 +100,3 @@ export const getProcessedOperator = (operator, keyChar) => {
 export const getProcessedIsNewOperator = (keyChar) => {
     return operatorChars.includes(keyChar);
 };
-
-export const getProcessedSign = (prevState, keyChar) => {
-    const { sign, valueOnDisplay } = prevState;
-
-    if(resetChars.includes(keyChar)){
-        return '+';
-    }
-
-    if(operatorChars.includes(keyChar)){
-        return '+';
-    }
-
-    if(!signChars.includes(keyChar)){
-        return sign;
-    }
-
-    if(numberify(valueOnDisplay) === 0){
-        return sign;
-    }
-
-    return sign === '+'? '-' : '+';
-};
