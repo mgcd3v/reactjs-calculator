@@ -17,10 +17,9 @@ export const CalculatorProvider = ({ children }) => {
     // State
     const [state, setState] = useState({
         result: null,
-        valueOnDisplay: 0,
+        valueOnDisplay: '0',
         operator: null,
         isNewOperator: false,
-        sign: '+'
     });
 
     // Events
@@ -30,8 +29,7 @@ export const CalculatorProvider = ({ children }) => {
                 const result = getProcessedResult(prevState, keyChar);
                 const operator = getProcessedOperator(prevState.operator, keyChar);
                 const isNewOperator = getProcessedIsNewOperator(keyChar);
-                const sign = getProcessedSign(prevState.sign, keyChar);
-                const valueOnDisplay = getProcessedValueOnDisplay(prevState, result, sign, keyChar);
+                const valueOnDisplay = getProcessedValueOnDisplay(prevState, result, keyChar);
                 
                 return {
                     ...prevState,
@@ -39,7 +37,6 @@ export const CalculatorProvider = ({ children }) => {
                     valueOnDisplay,
                     operator,
                     isNewOperator,
-                    sign,
                 }
             });
         },

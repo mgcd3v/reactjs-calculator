@@ -2,6 +2,9 @@ import React from 'react';
 import { useCalculator } from 'contexts/Calculator/CalculatorContext';
 import CalculatorDisplay from './CalculatorDisplay';
 import CalculatorKey from './CalculatorKey';
+import {
+    numberify,
+} from '../../utils/utils';
 
 const Calculator = () => {
     const { state } = useCalculator();
@@ -14,7 +17,7 @@ const Calculator = () => {
             <div className="calculator-keypad keys">
                 <div className="input-keys">
                     <div className="function-keys">
-                        <CalculatorKey className="key-clear" keyChar={(state.valueOnDisplay === 0)? 'AC' : 'C'} />
+                        <CalculatorKey className="key-clear" keyChar={(numberify(state.valueOnDisplay) === 0)? 'AC' : 'C'} />
                         <CalculatorKey className="key-sign" keyChar={'±'} />
                         <CalculatorKey className="key-percent" keyChar={'%'} />
                     </div>

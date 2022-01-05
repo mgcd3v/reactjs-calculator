@@ -1,3 +1,11 @@
+import {
+    numberify,
+    getNumbersOnly,
+    getAmountWithComma,
+    getSignedAmount,
+    getAmountInPercent,
+} from '../../utils/utils';
+
 // Constants
 const operatorChars = ['/', '*', '+', '-', '='];
 const resetChars = ['AC', 'C'];
@@ -5,35 +13,6 @@ const signChars = ['±'];
 const percChars = ['%'];
 
 // Process functions
-const getNumbersOnly = (value) => {
-    return value.replaceAll(',', '');
-};
-
-const getAmountWithComma = (amount) => {
-    const language = navigator.language || 'en-US';
-    let amountWithComma = parseFloat(amount).toLocaleString(language, 
-                                        {
-                                            useGrouping: true,
-                                            maximumFractionDigits: 6
-                                        });
-
-    const match = amount.match(/\.\d*?(0*)$/)
-    
-    if (match){
-        amountWithComma += (/[1-9]/).test(match[0]) ? match[1] : match[0];
-    }
-    
-    return amountWithComma;
-};
-
-const getSignedAmount = (amount, sign) => {
-    return Math.abs(Number(amount)) * ((sign === '+')? 1 : -1);
-};
-
-const getAmountInPercent = (amount) => {
-    return Number(amount) / 100;
-};
-
 export const getProcessedResult = (prevState, keyChar) => {
     const { result, valueOnDisplay, operator } = prevState;
 
@@ -41,31 +20,39 @@ export const getProcessedResult = (prevState, keyChar) => {
         return null;
     }
 
+    if(signChars.includes(keyChar)){
+        return getSignedAmount(result);
+    }
+
+    if(percChars.includes(keyChar)){
+        return getAmountInPercent(result);
+    }
+
     if(!operatorChars.includes(keyChar)){
-        return result;
+        return numberify(result);
     }
 
     if(operator === null){
-        return valueOnDisplay;
+        return numberify(valueOnDisplay);
     }
 
     let newResult = 0;
 
     switch(operator){
         case '/':
-            newResult = Number(result) / Number(valueOnDisplay);
+            newResult = numberify(result) / numberify(valueOnDisplay);
             break;
         case '*':
-            newResult = Number(result) * Number(valueOnDisplay);
+            newResult = numberify(result) * numberify(valueOnDisplay);
             break;
         case '+':
-            newResult = Number(result) + Number(valueOnDisplay);
+            newResult = numberify(result) + numberify(valueOnDisplay);
             break;
         case '-':
-            newResult = Number(result) - Number(valueOnDisplay);
+            newResult = numberify(result) - numberify(valueOnDisplay);
             break;
         case '=':
-            newResult = result;
+            newResult = numberify(result);
             break;
         default:
     }
@@ -73,26 +60,26 @@ export const getProcessedResult = (prevState, keyChar) => {
     return newResult;
 };
 
-export const getProcessedValueOnDisplay = (prevState, result, sign, keyChar) => {
+export const getProcessedValueOnDisplay = (prevState, result, keyChar) => {
     const { valueOnDisplay, isNewOperator } = prevState;
 
-    if(operatorChars.includes(keyChar)){
-        return result;
+    if(resetChars.includes(keyChar)){
+        return "0";
     }
 
-    if(resetChars.includes(keyChar)){
-        return 0;
+    if(operatorChars.includes(keyChar)){
+        return getAmountWithComma(result ?? valueOnDisplay);
     }
 
     if(signChars.includes(keyChar)){
-        return getSignedAmount(valueOnDisplay, sign);
+        return getSignedAmount(valueOnDisplay).toString();
     }
 
     if(percChars.includes(keyChar)){
         return getAmountInPercent(valueOnDisplay);
     }
 
-    const newValueOnDisplay = (Number(valueOnDisplay) === 0 || isNewOperator === true)? keyChar : getNumbersOnly(`${valueOnDisplay}${keyChar}`);
+    const newValueOnDisplay = (isNewOperator === true)? (keyChar === '.')? `${'0'}${keyChar}` : keyChar : getNumbersOnly(`${valueOnDisplay}${keyChar}`);
 
     return getAmountWithComma(newValueOnDisplay);
 };
@@ -114,13 +101,23 @@ export const getProcessedIsNewOperator = (keyChar) => {
     return operatorChars.includes(keyChar);
 };
 
-export const getProcessedSign = (sign, keyChar) => {
+export const getProcessedSign = (prevState, keyChar) => {
+    const { sign, valueOnDisplay } = prevState;
+
+    if(resetChars.includes(keyChar)){
+        return '+';
+    }
+
+    if(operatorChars.includes(keyChar)){
+        return '+';
+    }
+
     if(!signChars.includes(keyChar)){
         return sign;
     }
 
-    if(resetChars.includes(keyChar)){
-        return '+';
+    if(numberify(valueOnDisplay) === 0){
+        return sign;
     }
 
     return sign === '+'? '-' : '+';
