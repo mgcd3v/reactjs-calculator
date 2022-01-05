@@ -1,5 +1,5 @@
 {
-  "name": "testapp",
+  "name": "reactjs-calculator",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
